@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EIA Data Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="flex-center">
+
+    <!-- Main container for content -->
+    <div class="container">
+        <div class="dashboard-title">
+            <h1>EIA Data Dashboard</h1>
+            <p>Explore and Visualize EIA Energy Data</p>
+        </div>
+
+        <!-- Form for selecting data range -->
+        <form method="POST" action="/fetch_data" onsubmit="showLoading(event)">
+            <h2 class="text-center">Data Selection</h2>
+
+            <!-- Dropdown for selecting start year -->
+            <label for="start_year">Start Year:</label>
+            <select id="start_year" name="start_year">
+                {% for year in range(1990, 2024) %}
+                <option value="{{ year }}" {% if year == 1990 %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Dropdown for selecting end year -->
+            <label for="end_year">End Year:</label>
+            <select id="end_year" name="end_year">
+                {% for year in range(1990, 2024) %}
+                <option value="{{ year }}" {% if year == 2023 %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Submission button -->
+            <input type="submit" id="submit-button" value="Next">
+        </form>
+    </div>
+
+    <!-- JavaScript for handling form submission -->
+    <script>
+        function showLoading(event) {
+            var button = event.target.querySelector('#submit-button');
+            button.value = 'Loading...';
+            button.disabled = true;
+            button.classList.add('loading');
+        }
+    </script>
+
+</body>
+</html>

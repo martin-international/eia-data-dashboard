@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Features</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="flex-center">
+
+    <!-- Main content container -->
+    <div class="container">
+        <h1 class="text-center">Select Features to Graph</h1>
+
+        <!-- Form for selecting features to graph -->
+        <form action="{{ url_for('create_graphs') }}" method="post" onsubmit="showLoading(event)">
+
+            <!-- Container for dynamically generated feature checkboxes -->
+            <div class="form-check features-container">
+                {% for feature in features %}
+                    <div class="feature-row">
+                        <input type="checkbox" id="{{ feature }}" name="features" value="{{ feature }}" class="form-check-input" checked>
+                        <label for="{{ feature }}" class="feature-label">{{ feature }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Submission button -->
+            <input type="submit" id="submit-button" value="Create Graphs">
+        </form>
+    </div>
+
+    <!-- JavaScript for handling form submission -->
+    <script>
+        function showLoading(event) {
+            var button = event.target.querySelector('#submit-button');
+            button.value = 'Loading...';
+            button.disabled = true;
+            button.classList.add('loading');
+        }
+    </script>
+
+</body>
+</html>

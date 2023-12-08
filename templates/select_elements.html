@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Elements</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body class="flex-center">
+    <div class="container"> <!-- Container for the content -->
+        <h1 class="text-center">Select Elements to Graph</h1>
+        <form action="{{ url_for('create_graphs') }}" method="post" onsubmit="showLoading(event)">
+            <!-- Dynamically generated checkboxes for each element -->
+            <div class="form-check">
+				<div class="elements-container">
+					{% for element in elements %}
+						<div class="element-row">
+							<input type="checkbox" id="{{ element }}" name="elements" value="{{ element }}" class="form-check-input" checked>
+							<label for="{{ element }}" class="element-label">{{ element }}</label>
+						</div>
+					{% endfor %}
+				</div>
+
+
+			</div>
+
+            <input type="submit" id="submit-button" value="Create Graphs">
+
+        </form>
+    </div>
+	<script>
+	function showLoading(event) {
+		var button = event.target.querySelector('#submit-button');
+		button.value = 'Loading...';
+		button.disabled = false;
+		button.classList.add('loading');
+
+		// Remove preventDefault to allow form submission
+		// event.preventDefault();
+	}
+	</script>
+
+</body>
+</html>

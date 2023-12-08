@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.1/chroma.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="navbar-brand">EIA Data Dashboard</a>
+            <a href="/" class="btn btn-start-over">Start Over</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center">Dashboard</h1>
+        <button onclick="toggleHeatmaps()">Toggle Heatmaps</button>
+        
+        {% for graph_html, feature_geojson, feature in graph_heatmap_pairs %}
+            <div class="graph-container margin-top">
+                {{ graph_html | safe }}
+            </div>
+            <div id="title-{{ loop.index }}" class="map-title"></div>
+            <div id="map-{{ loop.index }}" class="map-container"></div>
+            <div id="legend-{{ loop.index }}" class="legend"></div>    
+        {% endfor %}
+
+        <a href="/" class="btn margin-top">Back to Home</a>
+    </div>
+
+    <div class="footer">
+        <p>Data Source: EIA</p>
+    </div>
+
+    <script>
+        function toggleHeatmaps() {
+            document.querySelectorAll('.map-container, .map-title, .legend')
+                .forEach(map => map.style.display = map.style.display === 'none' ? 'block' : 'none');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for graph_html, feature_geojson, feature in graph_heatmap_pairs %}
+                initMap('{{ loop.index }}', {{ feature_geojson | tojson | safe }}, "{{ feature }}");
+            {% endfor %}
+        });
+
+        function initMap(mapIndex, featureGeoJson, featureName) {
+            var mapId = 'map-' + mapIndex;
+            var map = L.map(mapId).setView([37.8, -96], 4);
+            addBaseLayer(map);
+            addGeoJsonLayer(map, featureGeoJson);
+            addLegend(map, featureGeoJson);
+            setMapTitle(mapIndex, featureName);
+        }
+
+        function addBaseLayer(map) {
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 9,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        function addGeoJsonLayer(map, featureGeoJson) {
+            var colorScale = getColorScale(featureGeoJson);
+            L.geoJson(featureGeoJson, {
+                style: feature => ({
+                    fillColor: colorScale(feature.properties.increaseValue).hex(),
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    fillOpacity: 0.7
+                }),
+                filter: feature => feature.properties.name !== 'US'
+            }).addTo(map);
+        }
+
+        function getColorScale(featureGeoJson) {
+            var increaseValues = featureGeoJson.features.map(f => f.properties.increaseValue);
+            var minMax = [Math.min(...increaseValues), Math.max(...increaseValues)];
+            return chroma.scale(['#2a9d8f', '#e9c46a', '#f4a261', '#e76f51']).domain(minMax).mode('lch');
+        }
+
+        function addLegend(map, featureGeoJson) {
+            var colorScale = getColorScale(featureGeoJson);
+            var legend = L.control({ position: 'bottomright' });
+            legend.onAdd = function(map) {
+                var div = L.DomUtil.create('div', 'info legend');
+                var legendContent = createLegendContent(colorScale);
+                div.innerHTML = legendContent;
+                return div;
+            };
+            legend.addTo(map);
+        }
+
+        function createLegendContent(colorScale) {
+            var content = '<div class="legend-title">Normalized Increase Rate</div>';
+            for (var i = 0; i <= 1; i += 0.25) {
+                content += '<i style="background:' + colorScale(i).hex() + '"></i> ' + i.toFixed(2) + '<br>';
+            }
+            return content;
+        }
+
+        function setMapTitle(mapIndex, featureName) {
+            document.getElementById('title-' + mapIndex).innerHTML = "Heatmap of " + featureName + " - Rate of Change";
+        }
+    </script>
+</body>
+</html>
