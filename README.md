@@ -1,4 +1,4 @@
-# EIA Data Dashboard
+# EIA Data Dashboard Tool
 
 ## Objective
 
