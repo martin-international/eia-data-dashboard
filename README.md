@@ -23,11 +23,6 @@ The workflow of the application is streamlined for efficiency:
 5. **Visualization**: Generates interactive visualizations using Plotly, offering a comprehensive data exploration experience.
 6. **User Interaction**: Provides an intuitive interface for users to interact with the data visualizations effectively.
 
-![index.html screenshot](https://github.com/martin-international/eia-data-dashboard/readme/index.png)
-![select_states.html screenshot](https://github.com/martin-international/eia-data-dashboard/readme/select_states.png)
-![select_features.html screenshot](https://github.com/martin-international/eia-data-dashboard/readme/select_features.png)
-![dashboard.html gif](https://github.com/martin-international/eia-data-dashboard/readme/dashboard.gif)
-
 ## Functionalities
 
 The tool includes functionalities such as:
