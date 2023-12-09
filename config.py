@@ -2,7 +2,7 @@
 import os
 
 class Config:
-    API_KEY = '7AMhnwl1ujEocsKA20qXv7Z7bgcbz4AAXC3HmesN' # Replace with your EIA API Key
+    API_KEY = 'YOUR_API_KEY' # Replace with your EIA API Key
     SECRET_KEY = os.environ.get('SECRET_KEY', '#7gjkemu893Uk4_2')
     DEBUG = False
     TESTING = False
