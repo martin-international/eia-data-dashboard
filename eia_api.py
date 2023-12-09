@@ -8,7 +8,7 @@ class EIA_API:
     def __init__(self, api_key, db_path='eia_data.db'):
         self.api_key = api_key
         self.db_path = db_path
-        # Base URL for EIA API requests
+        # Base URL for EIA API State Energy Profile requests
         self.base_url = 'https://api.eia.gov/v2/electricity/state-electricity-profiles/source-disposition/data/?frequency=annual&data%5B0%5D=combined-heat-and-pwr-comm&data%5B1%5D=combined-heat-and-pwr-elect&data%5B2%5D=combined-heat-and-pwr-indust&data%5B3%5D=direct-use&data%5B4%5D=elect-pwr-sector-gen-subtotal&data%5B5%5D=electric-utilities&data%5B6%5D=energy-only-providers&data%5B7%5D=estimated-losses&data%5B8%5D=facility-direct&data%5B9%5D=full-service-providers&data%5B10%5D=independent-power-producers&data%5B11%5D=indust-and-comm-gen-subtotal&data%5B12%5D=net-trade-index&data%5B13%5D=total-elect-indust&data%5B14%5D=total-international-exports&data%5B15%5D=total-international-imports&data%5B16%5D=total-net-generation&data%5B17%5D=total-supply&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&offset=0&length=5000'
 
     def fetch_and_store_data(self, start_date=None, end_date=None, fetch_sample=False):

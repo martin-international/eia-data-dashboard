@@ -52,7 +52,7 @@ def arima_forecast(historical_values, num_predictions, train_window=10):
 
     if best_model is not None:
         # Fit the selected model to the entire dataset
-        fitted_model = pm.ARIMA(order=best_order, seasonal=False, suppress_warnings=True).fit(data)
+        fitted_model = pm.ARIMA(order=best_order, suppress_warnings=True).fit(data)
 
         # Forecast future values
         forecast = fitted_model.predict(n_periods=num_predictions)
@@ -79,6 +79,17 @@ def create_graph(x_values, y_values, feature, graph_title, unit_type):
 
     return fig.to_html(full_html=False)
 
+def try_calculate_projections(series, max_years):
+    for num_years in range(max_years, 0, -1):
+        try:
+            projections = calculate_projections(series['y'], num_years=num_years)
+            return projections  # Return successfully calculated projections
+        except Exception as e:
+            pass
+
+    # If the loop completes without returning, it means all attempts failed
+    raise ValueError(f"Unable to calculate projections for any number of years up to {max_years}")
+
 def process_series(i, series, feature, unit_type, include_projections, projection_years, colors, all_y_values):
     fig = go.Figure()  # Create a separate figure for each series
     # Determine the color for the series
@@ -98,7 +109,10 @@ def process_series(i, series, feature, unit_type, include_projections, projectio
     all_y_values.extend(series['y'])
 
     if include_projections and series['y']:
-        projections = calculate_projections(series['y'], num_years=10)
+        try:
+            projections = try_calculate_projections(series, max_years=10)
+        except ValueError as e:
+            print(e)
         if projections:
             # Forecast future values using ARIMA
             future_years = [str(int(series['x'][-1]) + i - 1) for i in range(1, projection_years + 1)]

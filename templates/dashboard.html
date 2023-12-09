@@ -49,6 +49,10 @@
             {% endfor %}
         });
 
+		function setMapTitle(mapIndex, featureName) {
+            document.getElementById('title-' + mapIndex).innerHTML = "Heatmap of " + featureName + " - Rate of Change";
+        }
+
         function initMap(mapIndex, featureGeoJson, featureName) {
             var mapId = 'map-' + mapIndex;
             var map = L.map(mapId).setView([37.8, -96], 4);
@@ -96,17 +100,13 @@
             };
             legend.addTo(map);
         }
-
+		
         function createLegendContent(colorScale) {
             var content = '<div class="legend-title">Normalized Increase Rate</div>';
-            for (var i = 0; i <= 1; i += 0.25) {
+            for (var i = 1; i >= 0; i -= 0.25) {
                 content += '<i style="background:' + colorScale(i).hex() + '"></i> ' + i.toFixed(2) + '<br>';
             }
             return content;
-        }
-
-        function setMapTitle(mapIndex, featureName) {
-            document.getElementById('title-' + mapIndex).innerHTML = "Heatmap of " + featureName + " - Rate of Change";
         }
     </script>
 </body>
