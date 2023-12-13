@@ -51,11 +51,15 @@ While the application is designed to be comprehensive and user-friendly, it oper
 - **Data Source**: The tool is currently configured to display state energy profile data. The app was designed to be readily scalable to other EIA datasets.
 - **Performance Scalability**: Optimized for standard datasets, additional optimization may be required for larger datasets.
 - **Processing Time Variability**: Data processing times may differ based on the dataset size and system specifications.
+- **Security Best Practices**: The app is designed for internal use. It contains a static secret key and uses a development Flask server. It should not be used as a public-facing production server without modification.
 
 ## Extendability and Optimization
 
 - **Modular Design**: Simplifies the integration of additional datasets with minimal adjustments.
-- **Performance**: Utilizes parallel processing and smart data fetching to enhance user experience and resource efficiency.
+- **Performance**: The app is primarily designed for internal use and includes configurations suitable for development environments, such as a static secret key and the use of Flask's built-in server, which is not intended for production use. Before deploying this app in a public-facing production server, ensure to:
+    - Replace the static secret key with a dynamically generated one, preferably stored as an environment variable.
+    - Use a production-ready WSGI server instead of Flask's built-in server.
+    - Implement additional security measures such as HTTPS, proper exception handling, and input validation to safeguard against common vulnerabilities.
 
 ## Quick Start
 
