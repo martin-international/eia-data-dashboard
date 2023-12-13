@@ -18,10 +18,13 @@
 
             <!-- Container for dynamically generated feature checkboxes -->
             <div class="form-check features-container">
+                <button type="button" id="selectAllFeatures">Select All Features</button>
+                <button type="button" id="deselectAllFeatures">Deselect All Features</button>
+                <!-- The for loop for features now creates checkboxes -->
                 {% for feature in features %}
                     <div class="feature-row">
-                        <input type="checkbox" id="{{ feature }}" name="features" value="{{ feature }}" class="form-check-input" checked>
-                        <label for="{{ feature }}" class="feature-label">{{ feature }}</label>
+                        <input type="checkbox" id="feature_{{ feature }}" name="features" value="{{ feature }}" class="form-check-input" checked>
+                        <label for="feature_{{ feature }}" class="feature-label">{{ feature }}</label>
                     </div>
                 {% endfor %}
             </div>
@@ -39,6 +42,21 @@
             button.disabled = true;
             button.classList.add('loading');
         }
+        document.getElementById('selectAllFeatures').addEventListener('click', function(event) {
+            event.preventDefault();
+            var checkboxes = document.querySelectorAll('.form-check-input');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = true;
+            });
+        });
+
+        document.getElementById('deselectAllFeatures').addEventListener('click', function(event) {
+            event.preventDefault();
+            var checkboxes = document.querySelectorAll('.form-check-input');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = false;
+            });
+        });
     </script>
 
 </body>

@@ -51,17 +51,28 @@ class EIA_API:
                 for item in data['response']['data']:
                         for key, value in item.items():
                             if key.endswith('-units'):
-                                unit_key = key[:-6].replace('-', '_')  # Remove '_units' suffix and replace hyphens with underscores
+                                unit_key = key[:-6].replace('-', '_')  
                                 units_fields[unit_key] = value
             offset += page_size
             session['units_fields'] = units_fields
         
 
-    def make_paginated_request(self, url, offset, page_size):
-        """Makes a paginated request to the EIA API."""
+    def make_paginated_request(self, url, offset, page_size, timeout=10):
+        """Makes a paginated request to the EIA API with a timeout."""
         params = {'offset': offset, 'length': page_size}
-        response = requests.get(url, params=params)
-        return response
+        try:
+            response = requests.get(url, params=params, timeout=timeout)
+            response.raise_for_status()  # Raises an exception for HTTP errors
+            return response
+        except requests.exceptions.Timeout:
+            # Handle timeout exception
+            print("The request timed out. Please check your API credentials and network connection.")
+            return None
+        except requests.exceptions.RequestException as e:
+            # Handle other request-related exceptions
+            print(f"An error occurred: {e}")
+            return None
+
 
     def init_db(self, sample_data):
         """Initializes the database with sample data structure."""
@@ -91,9 +102,6 @@ class EIA_API:
             cursor.execute(query, (start_date, end_date))
             data = cursor.fetchall()
 
-        # Assume 'data' is a list of tuples in the form: [(state, total), ...]
-        # Convert to a dictionary: {state: total, ...}
-        #return {state: total for state, total in data if total is not None}
         increase_data = {state: total for state, total in data if total is not None}
         
         return increase_data

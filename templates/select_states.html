@@ -16,12 +16,15 @@
         <!-- Form for selecting states -->
         <form action="/select_states" method="post" onsubmit="showLoading(event)">
 
+            <button type="button" id="selectAllStates">Select All States</button>
+            <button type="button" id="deselectAllStates">Deselect All States</button>
+
             <!-- Scrollable list for states selection -->
             <div class="scrollable-list">
                 {% for state in states %}
                     <div class="state-item">
-                        <input type="checkbox" id="{{ state }}" name="states" value="{{ state }}" class="form-check-input" checked>
-                        <label for="{{ state }}" class="form-check-label">{{ state }}</label>
+                        <input type="checkbox" id="state_{{ state }}" name="states" value="{{ state }}" class="form-check-input" checked>
+                        <label for="state_{{ state }}" class="form-check-label">{{ state }}</label>
                     </div>
                 {% endfor %}
             </div>
@@ -39,6 +42,21 @@
             button.disabled = true;
             button.classList.add('loading');
         }
+		document.getElementById('selectAllStates').addEventListener('click', function(event) {
+            event.preventDefault();
+            var checkboxes = document.querySelectorAll('.scrollable-list .form-check-input');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = true;
+            });
+        });
+
+        document.getElementById('deselectAllStates').addEventListener('click', function(event) {
+            event.preventDefault();
+            var checkboxes = document.querySelectorAll('.scrollable-list .form-check-input');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = false;
+            });
+        });
     </script>
 
 </body>

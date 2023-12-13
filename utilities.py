@@ -4,6 +4,9 @@ import pmdarima as pm
 from statsmodels.tsa.arima.model import ARIMA
 import plotly.graph_objs as go
 import concurrent.futures
+from database import Database
+import eia_api
+
 
 def normalize_data(data):
     """
@@ -127,9 +130,6 @@ def process_series(i, series, feature, unit_type, include_projections, projectio
                 showlegend=False
             ))
             last_year = int(series['x'][-1])
-            #future_years = [str(last_year + i) for i in range(1, 11)]
-
-            # Add upper and lower bands of projections with transparent color
             fig.add_trace(go.Scatter(
                 x=future_years,
                 y=projections['upper'],
@@ -138,10 +138,10 @@ def process_series(i, series, feature, unit_type, include_projections, projectio
                 name=f"{series['name']} upper projection",
                 showlegend=False,
                 hoverlabel=dict(
-                    bgcolor=opaque_color,  # Yellow background with 50% opacity
-                    bordercolor=opaque_color, # Orange border
+                    bgcolor=opaque_color, 
+                    bordercolor=opaque_color,
                     font=dict(
-                        color='white'  # Text color
+                        color='white'  
                     )
                 ))
             )
@@ -155,10 +155,10 @@ def process_series(i, series, feature, unit_type, include_projections, projectio
                 name=f"{series['name']} lower projection",
                 showlegend=False,
                 hoverlabel=dict(
-                    bgcolor=opaque_color,  # Yellow background with 50% opacity
-                    bordercolor=opaque_color, # Orange border
+                    bgcolor=opaque_color,
+                    bordercolor=opaque_color,
                     font=dict(
-                        color='white'  # Text color
+                        color='white'
                     )
                 ))
             )
@@ -168,36 +168,32 @@ def create_combined_graph(series_data, element, unit_type, include_projections=F
     fig = go.Figure()
     all_y_values = []
     colors = [
-    "#E69F00",  # Orange
-    "#56B4E9",  # Sky Blue
-    "#009E73",  # Bluish Green
-    "#F0E442",  # Bright Yellow
-    "#0072B2",  # Blue
-    "#D55E00",  # Vermilion (reddish-orange)
-    "#CC79A7"   # Pale Pinkish Purple
+    "#E69F00",
+    "#56B4E9",
+    "#009E73",
+    "#F0E442",
+    "#0072B2",
+    "#D55E00",
+    "#CC79A7" 
     ]
     
     fig = go.Figure()
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:  # You can use ThreadPoolExecutor or ProcessPoolExecutor
+    with concurrent.futures.ThreadPoolExecutor() as executor:  
         futures = []
         for i, series in enumerate(series_data):
             futures.append(executor.submit(
                 process_series, i, series, element, unit_type, include_projections, projection_years, colors, all_y_values))
 
-        # Collect all figures
         for future in concurrent.futures.as_completed(futures):
             fig.add_traces(future.result().data)
         
-
-    # Set y-axis range
     y_min = min(all_y_values) * 0.75
     y_max = max(all_y_values) * 1.25
     fig.update_layout(
         yaxis=dict(range=[y_min, y_max])
     )
 
-    # Update layout
     fig.update_layout(
         title=f"{element} - {unit_type}",
         xaxis=dict(title='Year'),
@@ -248,24 +244,3 @@ def hex_to_rgba(hex_color, opacity=0.2):
         return f'rgba({", ".join(value.strip() for value in rgb_values)}, 0.2)', f'rgba({", ".join(value.strip() for value in rgb_values)}, 1)'
     else:
         return hex_color, hex_color
-
-def calculate_state_increase(state, element, start_date, end_date):
-    query = f"""
-        SELECT period, SUM(\"{element}\") AS aggregated_value FROM eia_data 
-        WHERE state = ? AND period BETWEEN ? AND ? 
-        AND \"{element}\" IS NOT NULL 
-        GROUP BY period
-        ORDER BY period
-    """
-    
-    with Database(eia_api.db_path) as conn:
-        cursor = conn.cursor()
-        cursor.execute(query, (state, start_date, end_date))
-        data = cursor.fetchall()
-
-    if data:
-        initial_value = float(data[0][1]) if data[0][1] is not None else 0
-        final_value = float(data[-1][1]) if data[-1][1] is not None else 0
-        return final_value - initial_value
-    else:
-        return 0
